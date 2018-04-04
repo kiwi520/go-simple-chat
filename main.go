@@ -200,19 +200,18 @@ func(cli *Client) WriteMessage() {
 	}
 }
 
-// serveWs handles websocket requests from the peer.
+// 接受websocket请求进行处理
 func ServeWs(sch *Scheduler, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	//初始化客户端
 	cli := &Client{Scheduler: sch, Conn: conn, Send: make(chan []byte, 256)}
 	cli.Scheduler.Register <- cli
 
-	// Allow collection of memory referenced by the caller by doing all work in
-	// new goroutines.
-	//go cli
+	//并非发送接受消息
 	go cli.readMessage()
 	go cli.WriteMessage()
 }
